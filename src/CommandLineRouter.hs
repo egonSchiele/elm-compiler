@@ -2,7 +2,7 @@ module Main where
 
 import qualified System.Directory as Dir
 import qualified System.Environment as Env
-import System.Exit (exitWith)
+import System.Exit (exitWith, exitFailure)
 import System.IO (hPutStrLn, stderr, stdin, stdout)
 import qualified System.Process as Proc
 
@@ -24,7 +24,7 @@ attemptToRun :: String -> [String] -> IO ()
 attemptToRun command args =
   do  found <- Dir.findExecutable ("elm-" ++ command)
       case found of
-        Nothing ->
+        Nothing -> do
           hPutStrLn stderr $
             "Could not find command `" ++ command ++ "`. Maybe there is a typo?\n\n\
             \Default commands include:\n\n"
@@ -32,6 +32,7 @@ attemptToRun command args =
             "\nWhen you try to run the command `" ++ command ++ "` we actually search for an\n\
             \  executable named elm-" ++ command ++ ". Are you able to run elm-" ++ command ++ "?\n\
             \  Is it on your PATH?"
+          exitFailure
 
         Just path ->
           let createProc =
